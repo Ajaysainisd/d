@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-REPO="ajay39/d"
+REPO="Ajaysainisd/d"
 BIN="d"
 INSTALL_DIR="/usr/local/bin"
 

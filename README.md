@@ -31,7 +31,7 @@ commands:
 Requires Rust. [Install Rust](https://rustup.rs) if you don't have it.
 
 ```bash
-git clone https://github.com/ajay39/d.git
+git clone https://github.com/Ajaysainisd/d.git
 cd d
 cargo build --release
 cp target/release/d-cli /usr/local/bin/d
