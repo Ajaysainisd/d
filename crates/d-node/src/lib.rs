@@ -25,14 +25,43 @@ impl Platform for NodePlatform {
 
     fn commands(&self) -> Vec<CommandDef> {
         let pm = detect_package_manager();
+        let npx = if pm == "pnpm" { "pnpm" } else { "npx" };
         vec![
             CommandDef::new("install", &pm, "Install dependencies").with_args(&["install"]),
-            CommandDef::new("dev", &pm, "Start dev server").with_args(&["run", "dev"]),
+            CommandDef::new("dev", &pm, "Start development server").with_args(&["run", "dev"]),
             CommandDef::new("build", &pm, "Build the project").with_args(&["run", "build"]),
             CommandDef::new("test", &pm, "Run tests").with_args(&["test"]),
             CommandDef::new("lint", &pm, "Lint code").with_args(&["run", "lint"]),
             CommandDef::new("format", &pm, "Format code").with_args(&["run", "format"]),
-            CommandDef::new("start", &pm, "Start the application").with_args(&["start"]),
+            CommandDef::new("start", &pm, "Start production server").with_args(&["start"]),
+            CommandDef::new("clean", "rm", "Remove node_modules and cache").with_args(&[
+                "-rf",
+                "node_modules",
+                ".cache",
+                "dist",
+                "build",
+            ]),
+            CommandDef::new("release", &pm, "Run release script").with_args(&["run", "release"]),
+            CommandDef::new("publish", &pm, "Publish to npm registry").with_args(&["publish"]),
+            CommandDef::new("watch", &pm, "Run with watch mode").with_args(&["run", "watch"]),
+            CommandDef::new("bench", &pm, "Run benchmarks").with_args(&["run", "bench"]),
+            CommandDef::new("check", "npx", "Type-check with TypeScript")
+                .with_args(&["tsc", "--noEmit"]),
+            CommandDef::new("update", &pm, "Update dependencies").with_args(&["update"]),
+            CommandDef::new("create", &pm, "Run create script (scaffold)")
+                .with_targets(&[""])
+                .with_args(&["create", "{target}"]),
+            CommandDef::new("run", &pm, "Execute an npm script")
+                .with_targets(&[""])
+                .with_args(&["run", "{target}"]),
+            CommandDef::new("ci", &pm, "Clean install for CI").with_args(&["ci"]),
+            CommandDef::new("audit", &pm, "Audit dependencies for vulnerabilities")
+                .with_args(&["audit"]),
+            CommandDef::new("outdated", &pm, "Check for outdated packages")
+                .with_args(&["outdated"]),
+            CommandDef::new("doctor", &pm, "Verify package.json").with_args(&["doctor"]),
+            CommandDef::new("init", &pm, "Initialize a new package.json").with_args(&["init"]),
+            CommandDef::new("serve", npx, "Serve with http-server").with_args(&["serve", "build"]),
         ]
     }
 
@@ -106,5 +135,12 @@ mod tests {
         let cmds = NodePlatform.commands();
         assert!(cmds.iter().any(|c| c.verb == "install"));
         assert!(cmds.iter().any(|c| c.verb == "test"));
+        assert!(cmds.iter().any(|c| c.verb == "dev"));
+        assert!(cmds.iter().any(|c| c.verb == "build"));
+        assert!(cmds.iter().any(|c| c.verb == "publish"));
+        assert!(cmds.iter().any(|c| c.verb == "watch"));
+        assert!(cmds.iter().any(|c| c.verb == "audit"));
+        assert!(cmds.iter().any(|c| c.verb == "update"));
+        assert!(cmds.len() > 15);
     }
 }

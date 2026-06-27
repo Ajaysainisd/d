@@ -32,22 +32,49 @@ impl Platform for PythonPlatform {
 
     fn commands(&self) -> Vec<CommandDef> {
         let pm = detect_package_manager();
+        let python = "python3";
         vec![
             CommandDef::new("install", &pm, "Install dependencies").with_args(&["install"]),
             CommandDef::new("dev", &pm, "Run in development").with_args(&["run", "dev"]),
-            CommandDef::new("build", &pm, "Build Python package").with_args(&["build"]),
+            CommandDef::new("build", &pm, "Build distribution packages").with_args(&["build"]),
             CommandDef::new("test", &pm, "Run tests").with_args(&["test"]),
             CommandDef::new("lint", &pm, "Lint code").with_args(&["run", "lint"]),
             CommandDef::new("format", &pm, "Format code").with_args(&["run", "format"]),
-            CommandDef::new("run", "python", "Run a Python script or module")
+            CommandDef::new("run", python, "Run a Python script or module")
                 .with_args(&["{target}"]),
-            CommandDef::new("clean", "rm", "Clean build artifacts").with_args(&[
+            CommandDef::new("clean", "rm", "Clean build artifacts and caches").with_args(&[
                 "-rf",
                 "__pycache__",
                 ".pytest_cache",
                 "dist",
                 "*.egg-info",
+                ".venv",
+                ".tox",
+                ".mypy_cache",
             ]),
+            CommandDef::new("release", &pm, "Build and publish release").with_args(&["publish"]),
+            CommandDef::new("publish", &pm, "Publish to PyPI").with_args(&["publish"]),
+            CommandDef::new("docs", &pm, "Build documentation").with_args(&["run", "docs"]),
+            CommandDef::new("bench", python, "Run benchmarks").with_args(&[
+                "-m",
+                "pytest",
+                "benchmarks",
+            ]),
+            CommandDef::new("check", &pm, "Run type checker").with_args(&["run", "check"]),
+            CommandDef::new("update", &pm, "Update dependencies").with_args(&["update"]),
+            CommandDef::new("freeze", "pip", "List installed packages (freeze)")
+                .with_args(&["freeze"]),
+            CommandDef::new("coverage", python, "Run tests with coverage")
+                .with_args(&["-m", "pytest", "--cov"]),
+            CommandDef::new("venv", python, "Create virtual environment")
+                .with_args(&["-m", "venv", ".venv"]),
+            CommandDef::new("doctor", &pm, "Check Python environment")
+                .with_args(&["config", "list"]),
+            CommandDef::new("serve", python, "Serve dev server via uvicorn")
+                .with_args(&["-m", "uvicorn", "main:app", "--reload"]),
+            CommandDef::new("repl", python, "Open Python REPL").with_args(&[]),
+            CommandDef::new("deps", &pm, "Show dependency tree").with_args(&["deps"]),
+            CommandDef::new("lock", &pm, "Lock dependencies").with_args(&["lock"]),
         ]
     }
 
@@ -123,5 +150,12 @@ mod tests {
         let cmds = PythonPlatform.commands();
         assert!(cmds.iter().any(|c| c.verb == "install"));
         assert!(cmds.iter().any(|c| c.verb == "test"));
+        assert!(cmds.iter().any(|c| c.verb == "build"));
+        assert!(cmds.iter().any(|c| c.verb == "publish"));
+        assert!(cmds.iter().any(|c| c.verb == "docs"));
+        assert!(cmds.iter().any(|c| c.verb == "coverage"));
+        assert!(cmds.iter().any(|c| c.verb == "venv"));
+        assert!(cmds.iter().any(|c| c.verb == "freeze"));
+        assert!(cmds.len() > 15);
     }
 }

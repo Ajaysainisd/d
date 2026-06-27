@@ -29,27 +29,10 @@ impl Platform for GradlePlatform {
 
     fn commands(&self) -> Vec<CommandDef> {
         let tool = detect_build_tool();
-        match tool.as_str() {
-            "gradle" => vec![
-                CommandDef::new("build", "gradle", "Build the project").with_args(&["build"]),
-                CommandDef::new("test", "gradle", "Run tests").with_args(&["test"]),
-                CommandDef::new("run", "gradle", "Run the application").with_args(&["run"]),
-                CommandDef::new("clean", "gradle", "Clean build artifacts").with_args(&["clean"]),
-                CommandDef::new("lint", "gradle", "Run lint checks").with_args(&["lint"]),
-                CommandDef::new("format", "gradle", "Format with spotless")
-                    .with_args(&["spotlessApply"]),
-                CommandDef::new("install", "gradle", "Set up dependencies")
-                    .with_args(&["dependencies"]),
-                CommandDef::new("release", "gradle", "Create release build")
-                    .with_args(&["assembleRelease"]),
-            ],
-            _ => vec![
-                CommandDef::new("build", "mvn", "Build the project")
-                    .with_args(&["package", "-DskipTests"]),
-                CommandDef::new("test", "mvn", "Run tests").with_args(&["test"]),
-                CommandDef::new("clean", "mvn", "Clean build artifacts").with_args(&["clean"]),
-                CommandDef::new("install", "mvn", "Install dependencies").with_args(&["install"]),
-            ],
+        if tool == "gradle" {
+            gradle_commands()
+        } else {
+            maven_commands()
         }
     }
 
@@ -67,6 +50,55 @@ impl Platform for GradlePlatform {
             },
         ]
     }
+}
+
+fn gradle_commands() -> Vec<CommandDef> {
+    vec![
+        CommandDef::new("build", "gradle", "Build the project").with_args(&["build"]),
+        CommandDef::new("test", "gradle", "Run tests").with_args(&["test"]),
+        CommandDef::new("run", "gradle", "Run the application").with_args(&["bootRun"]),
+        CommandDef::new("clean", "gradle", "Clean build artifacts").with_args(&["clean"]),
+        CommandDef::new("lint", "gradle", "Run lint checks").with_args(&["lint"]),
+        CommandDef::new("format", "gradle", "Format with spotless").with_args(&["spotlessApply"]),
+        CommandDef::new("install", "gradle", "Show dependency info").with_args(&["dependencies"]),
+        CommandDef::new("release", "gradle", "Create release build")
+            .with_args(&["assembleRelease"]),
+        CommandDef::new("assemble", "gradle", "Assemble all outputs").with_args(&["assemble"]),
+        CommandDef::new("check", "gradle", "Run all verification tasks").with_args(&["check"]),
+        CommandDef::new("javadoc", "gradle", "Generate Javadoc").with_args(&["javadoc"]),
+        CommandDef::new("dependencies", "gradle", "Show dependency tree")
+            .with_args(&["dependencies"]),
+        CommandDef::new("wrapper", "gradle", "Generate Gradle wrapper").with_args(&["wrapper"]),
+        CommandDef::new("doctor", "gradle", "Show Gradle version").with_args(&["--version"]),
+        CommandDef::new("watch", "gradle", "Build continuously")
+            .with_args(&["build", "--continuous"]),
+        CommandDef::new("init", "gradle", "Initialize a new Gradle project").with_args(&["init"]),
+        CommandDef::new("tasks", "gradle", "List all tasks").with_args(&["tasks"]),
+        CommandDef::new("refresh", "gradle", "Refresh dependencies")
+            .with_args(&["build", "--refresh-dependencies"]),
+        CommandDef::new("assembleDebug", "gradle", "Assemble debug build")
+            .with_args(&["assembleDebug"]),
+        CommandDef::new("testReport", "gradle", "Generate test report")
+            .with_args(&["test", "--tests", "*"]),
+    ]
+}
+
+fn maven_commands() -> Vec<CommandDef> {
+    vec![
+        CommandDef::new("build", "mvn", "Build the project").with_args(&["package", "-DskipTests"]),
+        CommandDef::new("test", "mvn", "Run tests").with_args(&["test"]),
+        CommandDef::new("clean", "mvn", "Clean build artifacts").with_args(&["clean"]),
+        CommandDef::new("install", "mvn", "Install to local repo").with_args(&["install"]),
+        CommandDef::new("run", "mvn", "Run main class").with_args(&["exec:java"]),
+        CommandDef::new("lint", "mvn", "Run static analysis").with_args(&["checkstyle:check"]),
+        CommandDef::new("release", "mvn", "Deploy release").with_args(&["deploy"]),
+        CommandDef::new("doctor", "mvn", "Show Maven version").with_args(&["--version"]),
+        CommandDef::new("javadoc", "mvn", "Generate Javadoc").with_args(&["javadoc:javadoc"]),
+        CommandDef::new("dependencies", "mvn", "Show dependency tree")
+            .with_args(&["dependency:tree"]),
+        CommandDef::new("update", "mvn", "Update dependency versions")
+            .with_args(&["versions:display-dependency-updates"]),
+    ]
 }
 
 fn detect_build_tool() -> String {
@@ -109,5 +141,6 @@ mod tests {
         let cmds = GradlePlatform.commands();
         assert!(cmds.iter().any(|c| c.verb == "build"));
         assert!(cmds.iter().any(|c| c.verb == "test"));
+        assert!(cmds.len() > 8);
     }
 }

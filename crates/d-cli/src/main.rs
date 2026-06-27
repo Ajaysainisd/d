@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 use clap::Parser;
-use cli::Cli;
+use cli::{Cli, Verb};
 use d_core::detect::{detect_platform, find_project_root};
 use d_core::hooks;
 use d_core::platform::Platform;
@@ -47,9 +47,11 @@ fn main() -> ExitCode {
         }
     };
 
-    if matches!(command, cli::Verb::Doctor) {
+    if matches!(command, Verb::Doctor) {
         return handle_doctor(&platforms, &cwd);
     }
+
+    let verb = command.parse_verb(&cli);
 
     let project_root = find_project_root(&cwd);
     debug!("Project root: {:?}", project_root);
@@ -63,10 +65,6 @@ fn main() -> ExitCode {
         platform.as_ref().map(|p| p.name())
     );
 
-    let verb = command.name();
-    let target = command.target();
-    let variant = command.variant();
-
     let project_config = d_core::config::load_d_yaml(&working_dir);
 
     let mut cli_env = HashMap::new();
@@ -75,9 +73,9 @@ fn main() -> ExitCode {
     }
 
     let resolved = resolve::resolve_command(
-        verb,
-        target,
-        variant,
+        &verb.name,
+        verb.target.as_deref(),
+        verb.variant.as_deref(),
         platform,
         project_config.as_ref(),
         &cli_env,
@@ -90,14 +88,14 @@ fn main() -> ExitCode {
                 return ExitCode::Success;
             }
 
-            if verb == "up" || verb == "down" || verb == "restart" {
+            if verb.name == "up" || verb.name == "down" || verb.name == "restart" {
                 let workspace_config = d_core::workspace::get_workspace_config(&working_dir);
                 if let Some(ws_config) = workspace_config {
                     if !ws_config.projects.is_empty() {
                         return execute_workspace(
                             &ws_config.projects,
                             &working_dir,
-                            verb,
+                            &verb.name,
                             &cli,
                             &platforms,
                         );
@@ -110,8 +108,8 @@ fn main() -> ExitCode {
         None => {
             error!(
                 "No command found for '{}' {}. Unknown command for this project type.",
-                verb,
-                target.unwrap_or("")
+                verb.name,
+                verb.target.as_deref().unwrap_or("")
             );
             error!("Run 'd --help' for usage.");
             ExitCode::InvalidCommand

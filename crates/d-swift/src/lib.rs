@@ -44,29 +44,9 @@ impl Platform for SwiftPlatform {
     fn commands(&self) -> Vec<CommandDef> {
         let spm = dir_has_spm();
         if spm {
-            vec![
-                CommandDef::new("build", "swift", "Build with SwiftPM").with_args(&["build"]),
-                CommandDef::new("run", "swift", "Run with SwiftPM").with_args(&["run"]),
-                CommandDef::new("test", "swift", "Run tests").with_args(&["test"]),
-                CommandDef::new("clean", "swift", "Clean build artifacts")
-                    .with_args(&["package", "clean"]),
-                CommandDef::new("lint", "swift", "Lint with SwiftLint if available")
-                    .with_args(&["lint"]),
-                CommandDef::new("format", "swift", "Format with swift-format if available")
-                    .with_args(&["format"]),
-                CommandDef::new("release", "swift", "Build in release mode")
-                    .with_args(&["build", "-c", "release"]),
-                CommandDef::new("install", "swift", "Resolve dependencies")
-                    .with_args(&["package", "resolve"]),
-            ]
+            spm_commands()
         } else {
-            vec![
-                CommandDef::new("build", "xcodebuild", "Build with Xcode").with_args(&["build"]),
-                CommandDef::new("test", "xcodebuild", "Run tests").with_args(&["test"]),
-                CommandDef::new("clean", "xcodebuild", "Clean build artifacts")
-                    .with_args(&["clean"]),
-                CommandDef::new("run", "open", "Open Xcode project").with_args(&["*.xcodeproj"]),
-            ]
+            xcode_commands()
         }
     }
 
@@ -83,6 +63,52 @@ impl Platform for SwiftPlatform {
             },
         ]
     }
+}
+
+fn spm_commands() -> Vec<CommandDef> {
+    vec![
+        CommandDef::new("build", "swift", "Build with SwiftPM").with_args(&["build"]),
+        CommandDef::new("run", "swift", "Run with SwiftPM").with_args(&["run"]),
+        CommandDef::new("test", "swift", "Run tests").with_args(&["test"]),
+        CommandDef::new("clean", "swift", "Clean build artifacts").with_args(&["package", "clean"]),
+        CommandDef::new("lint", "swift", "Lint with SwiftLint if available").with_args(&["lint"]),
+        CommandDef::new("format", "swift", "Format with swift-format").with_args(&["format"]),
+        CommandDef::new("release", "swift", "Build in release mode")
+            .with_args(&["build", "-c", "release"]),
+        CommandDef::new("install", "swift", "Resolve package dependencies")
+            .with_args(&["package", "resolve"]),
+        CommandDef::new("bench", "swift", "Run benchmarks").with_args(&["package", "benchmark"]),
+        CommandDef::new("doc", "swift", "Generate documentation")
+            .with_args(&["package", "generate-documentation"]),
+        CommandDef::new("repl", "swift", "Open Swift REPL").with_args(&["repl"]),
+        CommandDef::new("resolve", "swift", "Resolve dependencies")
+            .with_args(&["package", "resolve"]),
+        CommandDef::new("init", "swift", "Initialize a new package")
+            .with_args(&["package", "init"]),
+        CommandDef::new("dump-symbol-graph", "swift", "Dump symbol graph")
+            .with_args(&["package", "dump-symbol-graph"]),
+        CommandDef::new("coverage", "swift", "Test with coverage")
+            .with_args(&["test", "--enable-code-coverage"]),
+        CommandDef::new("doctor", "swift", "Show Swift version").with_args(&["--version"]),
+        CommandDef::new("update", "swift", "Update package dependencies")
+            .with_args(&["package", "update"]),
+        CommandDef::new("toolchain", "swift", "Show Swift version info").with_args(&["--version"]),
+    ]
+}
+
+fn xcode_commands() -> Vec<CommandDef> {
+    vec![
+        CommandDef::new("build", "xcodebuild", "Build with Xcode").with_args(&["build"]),
+        CommandDef::new("test", "xcodebuild", "Run tests").with_args(&["test"]),
+        CommandDef::new("clean", "xcodebuild", "Clean build artifacts").with_args(&["clean"]),
+        CommandDef::new("run", "open", "Open Xcode project").with_args(&["*.xcodeproj"]),
+        CommandDef::new("archive", "xcodebuild", "Create archive for distribution")
+            .with_args(&["archive"]),
+        CommandDef::new("lint", "swiftlint", "Lint with SwiftLint").with_args(&["lint"]),
+        CommandDef::new("format", "swiftformat", "Format with SwiftFormat").with_args(&["."]),
+        CommandDef::new("doctor", "xcodebuild", "Show Xcode version").with_args(&["-version"]),
+        CommandDef::new("analyze", "xcodebuild", "Run static analysis").with_args(&["analyze"]),
+    ]
 }
 
 fn dir_has_spm() -> bool {
@@ -122,5 +148,8 @@ mod tests {
         let cmds = SwiftPlatform.commands();
         assert!(cmds.iter().any(|c| c.verb == "build"));
         assert!(cmds.iter().any(|c| c.verb == "test"));
+        assert!(cmds.iter().any(|c| c.verb == "run"));
+        assert!(cmds.iter().any(|c| c.verb == "clean"));
+        assert!(cmds.len() > 5);
     }
 }

@@ -37,7 +37,7 @@ impl Platform for GoPlatform {
             CommandDef::new("run", "go", "Run the application").with_args(&["run", "."]),
             CommandDef::new("test", "go", "Run tests").with_args(&["test", "./..."]),
             CommandDef::new("lint", "go", "Lint with vet").with_args(&["vet", "./..."]),
-            CommandDef::new("format", "go", "Format code").with_args(&["fmt", "./..."]),
+            CommandDef::new("format", "go", "Format code (gofmt)").with_args(&["fmt", "./..."]),
             CommandDef::new("clean", "go", "Clean build cache").with_args(&["clean", "-cache"]),
             CommandDef::new("install", "go", "Download dependencies")
                 .with_args(&["mod", "download"]),
@@ -46,6 +46,27 @@ impl Platform for GoPlatform {
                 "-ldflags=-s -w",
                 "./...",
             ]),
+            CommandDef::new("bench", "go", "Run benchmarks")
+                .with_args(&["test", "-bench=.", "./..."]),
+            CommandDef::new("doc", "go", "Serve documentation").with_args(&["doc"]),
+            CommandDef::new("generate", "go", "Run go generate").with_args(&["generate", "./..."]),
+            CommandDef::new("race", "go", "Test with race detector")
+                .with_args(&["test", "-race", "./..."]),
+            CommandDef::new("tidy", "go", "Tidy module dependencies").with_args(&["mod", "tidy"]),
+            CommandDef::new("vendor", "go", "Vendor dependencies").with_args(&["mod", "vendor"]),
+            CommandDef::new("verify", "go", "Verify module hashes").with_args(&["mod", "verify"]),
+            CommandDef::new("coverage", "go", "Run tests with coverage").with_args(&[
+                "test",
+                "-coverprofile=coverage.out",
+                "./...",
+            ]),
+            CommandDef::new("mod-init", "go", "Initialize go module").with_args(&["mod", "init"]),
+            CommandDef::new("get", "go", "Add a dependency").with_args(&["get"]),
+            CommandDef::new("fmt-check", "go", "Check if files need formatting")
+                .with_args(&["fmt", "-n", "./..."]),
+            CommandDef::new("doctor", "go", "Show Go version and env").with_args(&["version"]),
+            CommandDef::new("env", "go", "Show Go environment").with_args(&["env"]),
+            CommandDef::new("list", "go", "List packages").with_args(&["list", "./..."]),
         ]
     }
 
@@ -93,5 +114,13 @@ mod tests {
         assert!(cmds.iter().any(|c| c.verb == "build"));
         assert!(cmds.iter().any(|c| c.verb == "run"));
         assert!(cmds.iter().any(|c| c.verb == "test"));
+        assert!(cmds.iter().any(|c| c.verb == "bench"));
+        assert!(cmds.iter().any(|c| c.verb == "doc"));
+        assert!(cmds.iter().any(|c| c.verb == "generate"));
+        assert!(cmds.iter().any(|c| c.verb == "race"));
+        assert!(cmds.iter().any(|c| c.verb == "tidy"));
+        assert!(cmds.iter().any(|c| c.verb == "vendor"));
+        assert!(cmds.iter().any(|c| c.verb == "coverage"));
+        assert!(cmds.len() > 15);
     }
 }

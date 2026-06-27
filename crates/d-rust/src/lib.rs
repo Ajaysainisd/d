@@ -15,7 +15,6 @@ impl Platform for RustPlatform {
         if dir.join("Cargo.toml").exists() {
             if let Ok(contents) = std::fs::read_to_string(dir.join("Cargo.toml")) {
                 if contents.contains("[package]") || contents.contains("[workspace]") {
-                    // Lower confidence if Flutter/Dart is also present
                     if dir.join("pubspec.yaml").exists() {
                         return 0.3;
                     }
@@ -38,6 +37,26 @@ impl Platform for RustPlatform {
             CommandDef::new("install", "cargo", "Check/verify dependencies").with_args(&["check"]),
             CommandDef::new("release", "cargo", "Build in release mode")
                 .with_args(&["build", "--release"]),
+            CommandDef::new("bench", "cargo", "Run benchmarks").with_args(&["bench"]),
+            CommandDef::new("doc", "cargo", "Build documentation").with_args(&["doc"]),
+            CommandDef::new("publish", "cargo", "Publish to crates.io").with_args(&["publish"]),
+            CommandDef::new("update", "cargo", "Update dependencies").with_args(&["update"]),
+            CommandDef::new("check", "cargo", "Check compilation without building")
+                .with_args(&["check"]),
+            CommandDef::new("audit", "cargo", "Audit for security vulnerabilities")
+                .with_args(&["audit"]),
+            CommandDef::new("watch", "cargo", "Watch for changes and rebuild")
+                .with_args(&["watch"]),
+            CommandDef::new("fix", "cargo", "Auto-fix compiler suggestions")
+                .with_args(&["fix", "--allow-dirty"]),
+            CommandDef::new("expand", "cargo", "Expand macros").with_args(&["expand"]),
+            CommandDef::new("doctor", "cargo", "Show cargo version").with_args(&["version"]),
+            CommandDef::new("tree", "cargo", "Show dependency tree").with_args(&["tree"]),
+            CommandDef::new("outdated", "cargo", "Check for outdated dependencies")
+                .with_args(&["outdated"]),
+            CommandDef::new("init", "cargo", "Initialize a new Rust project").with_args(&["init"]),
+            CommandDef::new("new", "cargo", "Create a new Rust project").with_args(&["new"]),
+            CommandDef::new("creates", "cargo", "Create a new crate").with_args(&["new"]),
         ]
     }
 
@@ -87,5 +106,12 @@ mod tests {
         assert!(cmds.iter().any(|c| c.verb == "build"));
         assert!(cmds.iter().any(|c| c.verb == "test"));
         assert!(cmds.iter().any(|c| c.verb == "run"));
+        assert!(cmds.iter().any(|c| c.verb == "bench"));
+        assert!(cmds.iter().any(|c| c.verb == "doc"));
+        assert!(cmds.iter().any(|c| c.verb == "publish"));
+        assert!(cmds.iter().any(|c| c.verb == "update"));
+        assert!(cmds.iter().any(|c| c.verb == "audit"));
+        assert!(cmds.iter().any(|c| c.verb == "fix"));
+        assert!(cmds.len() > 15);
     }
 }
