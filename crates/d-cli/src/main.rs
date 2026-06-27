@@ -22,6 +22,13 @@ fn main() -> ExitCode {
         d_flutter::platform(),
         d_docker::platform(),
         d_node::platform(),
+        d_python::platform(),
+        d_django::platform(),
+        d_rust::platform(),
+        d_go::platform(),
+        d_gradle::platform(),
+        d_rails::platform(),
+        d_swift::platform(),
     ];
 
     let cwd = match env::current_dir() {

@@ -5,6 +5,13 @@ members = [
     "crates/d-flutter",
     "crates/d-docker",
     "crates/d-node",
+    "crates/d-python",
+    "crates/d-django",
+    "crates/d-rust",
+    "crates/d-go",
+    "crates/d-gradle",
+    "crates/d-rails",
+    "crates/d-swift",
 ]
 resolver = "2"
 

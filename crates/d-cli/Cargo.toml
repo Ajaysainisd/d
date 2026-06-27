@@ -9,6 +9,13 @@ d-core = { path = "../d-core" }
 d-flutter = { path = "../d-flutter" }
 d-docker = { path = "../d-docker" }
 d-node = { path = "../d-node" }
+d-python = { path = "../d-python" }
+d-django = { path = "../d-django" }
+d-rust = { path = "../d-rust" }
+d-go = { path = "../d-go" }
+d-gradle = { path = "../d-gradle" }
+d-rails = { path = "../d-rails" }
+d-swift = { path = "../d-swift" }
 clap = { version = "4", features = ["derive"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
