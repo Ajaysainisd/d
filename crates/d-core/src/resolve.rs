@@ -8,14 +8,13 @@ pub fn resolve_command(
     verb: &str,
     target: Option<&str>,
     variant: Option<&str>,
-    platform: Option<&Box<dyn Platform>>,
+    platform: Option<&dyn Platform>,
     project_config: Option<&ProjectConfig>,
     cli_env: &HashMap<String, String>,
 ) -> Option<ResolvedCommand> {
     let target_opt = target.map(|t| t.to_string());
     let variant_opt = variant.map(|v| v.to_string());
 
-    // Layer 2: d.yaml project config overrides
     if let Some(config) = project_config {
         let parsed = crate::config::parse_d_yaml_override(config, verb, &target_opt, &variant_opt);
         if let Some(cmd_def) = parsed {
@@ -30,7 +29,6 @@ pub fn resolve_command(
         }
     }
 
-    // Layer 4: Platform defaults
     if let Some(p) = platform {
         let commands = p.commands();
         let best = find_best_match(verb, target, variant, &commands);
@@ -39,14 +37,13 @@ pub fn resolve_command(
                 verb,
                 &target_opt,
                 &variant_opt,
-                &cmd_def,
+                cmd_def,
                 ResolutionSource::PlatformDefault,
                 cli_env,
             ));
         }
     }
 
-    // Layer 5: Built-in universal defaults
     let universal = builtin_commands();
     let best = find_best_match(verb, target, variant, &universal);
     best.map(|cmd_def| {
@@ -54,7 +51,7 @@ pub fn resolve_command(
             verb,
             &target_opt,
             &variant_opt,
-            &cmd_def,
+            cmd_def,
             ResolutionSource::BuiltInDefault,
             cli_env,
         )
@@ -91,17 +88,12 @@ fn find_best_match<'a>(
     variant: Option<&str>,
     commands: &'a [CommandDef],
 ) -> Option<&'a CommandDef> {
-    let verb_matches: Vec<&CommandDef> = commands
-        .iter()
-        .filter(|c| c.verb == verb)
-        .collect();
+    let verb_matches: Vec<&CommandDef> = commands.iter().filter(|c| c.verb == verb).collect();
 
     if verb_matches.is_empty() {
         return None;
     }
 
-    // No target given — return the first verb match that has no targets
-    // or requires no target
     if target.is_none() {
         let no_target = verb_matches.iter().find(|c| c.targets.is_empty());
         if let Some(found) = no_target {
@@ -112,10 +104,10 @@ fn find_best_match<'a>(
 
     let t = target.unwrap();
 
-    // Find exact target match
-    let target_match = verb_matches.iter().find(|c| c.targets.contains(&t.to_string()));
+    let target_match = verb_matches
+        .iter()
+        .find(|c| c.targets.contains(&t.to_string()));
     if let Some(found) = target_match {
-        // If variant given, prefer one that supports it
         if let Some(v) = variant {
             let variant_match = verb_matches.iter().find(|c| {
                 c.targets.contains(&t.to_string()) && c.variants.contains(&v.to_string())
@@ -127,7 +119,6 @@ fn find_best_match<'a>(
         return Some(found);
     }
 
-    // Fallback to first verb match
     verb_matches.first().copied()
 }
 
@@ -170,11 +161,7 @@ mod tests {
 
     #[test]
     fn test_substitute_placeholders() {
-        let template = vec![
-            "run".to_string(),
-            "-d".to_string(),
-            "{target}".to_string(),
-        ];
+        let template = vec!["run".to_string(), "-d".to_string(), "{target}".to_string()];
         let result = substitute_placeholders(&template, &Some("chrome".into()), &None);
         assert_eq!(result, vec!["run", "-d", "chrome"]);
     }

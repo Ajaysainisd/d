@@ -26,20 +26,13 @@ impl Platform for NodePlatform {
     fn commands(&self) -> Vec<CommandDef> {
         let pm = detect_package_manager();
         vec![
-            CommandDef::new("install", &pm, "Install dependencies")
-                .with_args(&["install"]),
-            CommandDef::new("dev", &pm, "Start dev server")
-                .with_args(&["run", "dev"]),
-            CommandDef::new("build", &pm, "Build the project")
-                .with_args(&["run", "build"]),
-            CommandDef::new("test", &pm, "Run tests")
-                .with_args(&["test"]),
-            CommandDef::new("lint", &pm, "Lint code")
-                .with_args(&["run", "lint"]),
-            CommandDef::new("format", &pm, "Format code")
-                .with_args(&["run", "format"]),
-            CommandDef::new("start", &pm, "Start the application")
-                .with_args(&["start"]),
+            CommandDef::new("install", &pm, "Install dependencies").with_args(&["install"]),
+            CommandDef::new("dev", &pm, "Start dev server").with_args(&["run", "dev"]),
+            CommandDef::new("build", &pm, "Build the project").with_args(&["run", "build"]),
+            CommandDef::new("test", &pm, "Run tests").with_args(&["test"]),
+            CommandDef::new("lint", &pm, "Lint code").with_args(&["run", "lint"]),
+            CommandDef::new("format", &pm, "Format code").with_args(&["run", "format"]),
+            CommandDef::new("start", &pm, "Start the application").with_args(&["start"]),
         ]
     }
 

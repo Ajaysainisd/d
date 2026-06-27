@@ -1,7 +1,11 @@
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-#[command(name = "d", about = "One command system for every development project", version)]
+#[command(
+    name = "d",
+    about = "One command system for every development project",
+    version
+)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Verb>,

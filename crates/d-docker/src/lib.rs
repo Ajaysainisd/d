@@ -28,17 +28,14 @@ impl Platform for DockerPlatform {
 
     fn commands(&self) -> Vec<CommandDef> {
         vec![
-            CommandDef::new("up", "docker", "Start services")
-                .with_args(&["compose", "up"]),
+            CommandDef::new("up", "docker", "Start services").with_args(&["compose", "up"]),
             CommandDef::new("up", "docker", "Start services detached")
                 .with_variants(&["detached"])
                 .with_args(&["compose", "up", "-d"]),
-            CommandDef::new("down", "docker", "Stop services")
-                .with_args(&["compose", "down"]),
+            CommandDef::new("down", "docker", "Stop services").with_args(&["compose", "down"]),
             CommandDef::new("restart", "docker", "Restart services")
                 .with_args(&["compose", "restart"]),
-            CommandDef::new("logs", "docker", "View service logs")
-                .with_args(&["compose", "logs"]),
+            CommandDef::new("logs", "docker", "View service logs").with_args(&["compose", "logs"]),
             CommandDef::new("build", "docker", "Build service images")
                 .with_args(&["compose", "build"]),
             CommandDef::new("shell", "docker", "Open a shell in a service container")
@@ -71,7 +68,9 @@ fn check_docker_daemon() -> DoctorCheck {
             category: "tool".to_string(),
             status: DoctorStatus::Fail,
             message: Some("Docker daemon is not running".to_string()),
-            suggestion: Some("Start Docker Desktop or run `sudo systemctl start docker`".to_string()),
+            suggestion: Some(
+                "Start Docker Desktop or run `sudo systemctl start docker`".to_string(),
+            ),
         },
         Err(e) => DoctorCheck {
             name: "docker-daemon".to_string(),

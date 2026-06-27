@@ -121,19 +121,21 @@ struct RawWorkspace {
     workspace: Vec<String>,
 }
 
-pub fn parse_d_yaml_override(config: &ProjectConfig, verb: &str, target: &Option<String>, variant: &Option<String>) -> Option<CommandDef> {
+pub fn parse_d_yaml_override(
+    config: &ProjectConfig,
+    verb: &str,
+    target: &Option<String>,
+    variant: &Option<String>,
+) -> Option<CommandDef> {
     let verbs = config.commands.as_ref()?;
-    let verb_cfg = match verb {
-        // serde_yaml flatten into HashMap means keys are the verb names
-        _ => {
-            let key = verb;
-            verbs.verbs.get(key)?
-        }
-    };
+    let verb_cfg = verbs.verbs.get(verb)?;
 
     let target = target.as_deref().unwrap_or("default");
 
-    let target_cfg = verb_cfg.targets.get(target).or_else(|| verb_cfg.targets.get("default"))?;
+    let target_cfg = verb_cfg
+        .targets
+        .get(target)
+        .or_else(|| verb_cfg.targets.get("default"))?;
 
     match target_cfg {
         TargetConfig::Simple(cmd_str) => {
@@ -221,9 +223,17 @@ commands:
       debug: flutter build ios --debug
 "#;
         let config: ProjectConfig = serde_yaml::from_str(yaml).unwrap();
-        let cmd = parse_d_yaml_override(&config, "build", &Some("ios".into()), &Some("release".into()));
+        let cmd = parse_d_yaml_override(
+            &config,
+            "build",
+            &Some("ios".into()),
+            &Some("release".into()),
+        );
         assert!(cmd.is_some());
-        assert!(cmd.unwrap().args_template.contains(&"--release".to_string()));
+        assert!(cmd
+            .unwrap()
+            .args_template
+            .contains(&"--release".to_string()));
     }
 
     #[test]

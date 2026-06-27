@@ -63,13 +63,23 @@ fn is_project_root(dir: &Path) -> bool {
         || dir.join("go.mod").exists()
 }
 
-pub fn detect_platform<'a>(dir: &Path, configured_type: Option<&str>, platforms: &'a [Box<dyn Platform>]) -> Option<&'a Box<dyn Platform>> {
+pub fn detect_platform<'a>(
+    dir: &Path,
+    configured_type: Option<&str>,
+    platforms: &'a [Box<dyn Platform>],
+) -> Option<&'a dyn Platform> {
     if let Some(ptype) = configured_type {
-        return platforms.iter().find(|p| p.name() == ptype);
+        return platforms
+            .iter()
+            .find(|p| p.name() == ptype)
+            .map(|b| b.as_ref());
     }
 
     let (name, _) = detect_project_type(platforms, dir)?;
-    platforms.iter().find(|p| p.name() == name)
+    platforms
+        .iter()
+        .find(|p| p.name() == name)
+        .map(|b| b.as_ref())
 }
 
 #[cfg(test)]

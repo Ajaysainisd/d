@@ -49,7 +49,12 @@ pub fn check_tool(name: &str, check_name: &str, category: &str) -> DoctorCheck {
     }
 }
 
-pub fn check_command_run(name: &str, args: &[&str], check_name: &str, category: &str) -> DoctorCheck {
+pub fn check_command_run(
+    name: &str,
+    args: &[&str],
+    check_name: &str,
+    category: &str,
+) -> DoctorCheck {
     match Command::new(name).args(args).output() {
         Ok(output) if output.status.success() => DoctorCheck {
             name: check_name.to_string(),

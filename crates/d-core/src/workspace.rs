@@ -5,11 +5,7 @@ use tracing::info;
 use crate::config::WorkspaceConfig;
 
 pub fn list_projects(config: &WorkspaceConfig, root_dir: &Path) -> Vec<std::path::PathBuf> {
-    config
-        .projects
-        .iter()
-        .map(|p| root_dir.join(p))
-        .collect()
+    config.projects.iter().map(|p| root_dir.join(p)).collect()
 }
 
 pub fn is_workspace_root(dir: &Path) -> bool {
@@ -44,9 +40,12 @@ mod tests {
         };
         let root = Path::new("/project");
         let dirs = list_projects(&config, root);
-        assert_eq!(dirs, vec![
-            std::path::PathBuf::from("/project/backend"),
-            std::path::PathBuf::from("/project/mobile"),
-        ]);
+        assert_eq!(
+            dirs,
+            vec![
+                std::path::PathBuf::from("/project/backend"),
+                std::path::PathBuf::from("/project/mobile"),
+            ]
+        );
     }
 }

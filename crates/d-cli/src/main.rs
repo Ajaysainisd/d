@@ -51,7 +51,10 @@ fn main() -> ExitCode {
 
     let configured_type = cli.project_type.as_deref();
     let platform = detect_platform(&working_dir, configured_type, &platforms);
-    debug!("Detected platform: {:?}", platform.as_ref().map(|p| p.name()));
+    debug!(
+        "Detected platform: {:?}",
+        platform.as_ref().map(|p| p.name())
+    );
 
     let verb = command.name();
     let target = command.target();
@@ -137,7 +140,14 @@ fn execute_workspace(
             cli_env.insert("D_ENV".to_string(), env_name.clone());
         }
 
-        let resolved = resolve::resolve_command(verb, None, None, platform, project_config.as_ref(), &cli_env);
+        let resolved = resolve::resolve_command(
+            verb,
+            None,
+            None,
+            platform,
+            project_config.as_ref(),
+            &cli_env,
+        );
 
         match resolved {
             Some(mut cmd) => {
@@ -265,9 +275,18 @@ fn handle_doctor(platforms: &[Box<dyn Platform>], cwd: &std::path::Path) -> Exit
 
     for check in &all_checks {
         let icon = match check.status {
-            d_core::types::DoctorStatus::Pass => { pass += 1; "✓" }
-            d_core::types::DoctorStatus::Warn => { warn += 1; "⚠" }
-            d_core::types::DoctorStatus::Fail => { fail += 1; "✗" }
+            d_core::types::DoctorStatus::Pass => {
+                pass += 1;
+                "✓"
+            }
+            d_core::types::DoctorStatus::Warn => {
+                warn += 1;
+                "⚠"
+            }
+            d_core::types::DoctorStatus::Fail => {
+                fail += 1;
+                "✗"
+            }
         };
         println!("  {} {}", icon, check.name);
         if let Some(ref msg) = check.message {
@@ -278,7 +297,10 @@ fn handle_doctor(platforms: &[Box<dyn Platform>], cwd: &std::path::Path) -> Exit
         }
     }
 
-    println!("\n  {} passed, {} warnings, {} failures\n", pass, warn, fail);
+    println!(
+        "\n  {} passed, {} warnings, {} failures\n",
+        pass, warn, fail
+    );
 
     if fail > 0 {
         ExitCode::DependencyMissing

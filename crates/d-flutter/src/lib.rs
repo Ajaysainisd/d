@@ -35,16 +35,11 @@ impl Platform for FlutterPlatform {
             CommandDef::new("build", "flutter", "Build the Flutter application")
                 .with_targets(&["ios", "android", "web", "macos", "linux", "windows"])
                 .with_args(&["build", "{target}"]),
-            CommandDef::new("test", "flutter", "Run Flutter tests")
-                .with_args(&["test"]),
-            CommandDef::new("clean", "flutter", "Clean build artifacts")
-                .with_args(&["clean"]),
-            CommandDef::new("format", "dart", "Format Dart code")
-                .with_args(&["format", "."]),
-            CommandDef::new("doctor", "flutter", "Run Flutter doctor")
-                .with_args(&["doctor"]),
-            CommandDef::new("lint", "dart", "Analyze Dart code")
-                .with_args(&["analyze"]),
+            CommandDef::new("test", "flutter", "Run Flutter tests").with_args(&["test"]),
+            CommandDef::new("clean", "flutter", "Clean build artifacts").with_args(&["clean"]),
+            CommandDef::new("format", "dart", "Format Dart code").with_args(&["format", "."]),
+            CommandDef::new("doctor", "flutter", "Run Flutter doctor").with_args(&["doctor"]),
+            CommandDef::new("lint", "dart", "Analyze Dart code").with_args(&["analyze"]),
         ]
     }
 
