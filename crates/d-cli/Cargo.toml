@@ -1,0 +1,15 @@
+[package]
+name = "d-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+d-core = { path = "../d-core" }
+d-flutter = { path = "../d-flutter" }
+d-docker = { path = "../d-docker" }
+d-node = { path = "../d-node" }
+clap = { version = "4", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1", features = ["process", "rt"] }
